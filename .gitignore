@@ -118,3 +118,7 @@ Dotenv
 src/wrool_ai/config/*default.yaml
 src/wrool_ai/config/*production.yaml
 src/wrool_ai/config/*__init__.py
+scripts/setup_environment.sh
+src/wrool_ai/modules/nlp/*text_classifier.py
+src/wrool_ai/modules/__init__.py
+
