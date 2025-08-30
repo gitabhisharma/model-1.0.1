@@ -1,0 +1,17 @@
+# wrool-ai-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wrool-ai
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+      - name: wrool-ai
+        image: wrool-ai:latest
+        ports:
+        - containerPort: 8000
+        resources:
+          limits:
+            nvidia.com/gpu: 1

@@ -1,0 +1,16 @@
+# Production-specific overrides
+
+training:
+  batch_size: 64
+  num_epochs: 20
+
+hardware:
+  use_gpu: true
+  num_workers: 8
+
+logging:
+  level: "WARNING"
+
+api:
+  debug: false
+  workers: 8

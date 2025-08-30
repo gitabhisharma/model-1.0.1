@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>wrool-ai</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/login.css">
+    <style>
+        :root {
+            --primary: #1e88e5;
+            --primary-dark: #1565c0;
+            --primary-light: #e3f2fd;
+            --background: #f5f7fa;
+            --surface: #ffffff;
+            --text-primary: #212121;
+            --text-secondary: #666666;
+            --border: #e0e0e0;
+            --user-bubble: #e3f2fd;
+            --bot-bubble: #f5f5f5;
+            --file-bubble: #e8f5e9;
+            --error: #f44336;
+            --success: #4caf50;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #app-container {
+            display: flex;
+            height: 100%;
+            width: 100%;
+        }
+
+        /* Sidebar Styles */
+        #sidebar {
+            width: 280px;
+            background-color: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            transition: transform 0.3s ease;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        #user-profile {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+        }
+
+        #user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-weight: 500;
+        }
+
+        #user-info {
+            flex-grow: 1;
+        }
+
+        #user-name {
+            font-weight: 500;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+
+        #user-email {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        #new-chat-btn {
+            margin: 15px;
+            padding: 12px 16px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+
+        #new-chat-btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        #new-chat-btn i {
+            margin-right: 8px;
+        }
+
+        #chat-history {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px 0;
+        }
+
+        .chat-item {
+            padding: 12px 20px;
+            margin: 0 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 14px;
+            transition: background-color 0.2s;
+            position: relative;
+        }
+
+        .chat-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        .chat-item.active {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .chat-item-delete {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .chat-item:hover .chat-item-delete {
+            opacity: 1;
+        }
+
+        /* Main Content Styles */
+        #main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            position: relative;
+        }
+
+        #chat-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            background-color: var(--surface);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        #chat-title {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        #model-selector {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            font-size: 14px;
+            background-color: var(--surface);
+            color: var(--text-primary);
+        }
+
+        #menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-primary);
+            margin-right: 12px;
+        }
+
+        #chat-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background-color: var(--surface);
+            scroll-behavior: smooth;
+        }
+
+        .message-container {
+            max-width: 800px;
+            margin: 0 auto 20px;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-weight: 500;
+            color: white;
+        }
+
+
+        .message-content {
+            flex-grow: 1;
+            position: relative;
+        }
+
+        .message-role {
+            font-weight: 600;
+            margin-bottom: 4px;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .message-text {
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        .message-bubble {
+            padding: 12px 16px;
+            border-radius: 12px;
+            max-width: 80%;
+            position: relative;
+        }
+
+        .bot-message .message-bubble {
+            background-color: var(--bot-bubble);
+            border-top-left-radius: 4px;
+        }
+
+        .message-actions {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            display: flex;
+            gap: 5px;
+        }
+
+        .message-bubble:hover .message-actions {
+            opacity: 1;
+        }
+
+        .message-action {
+            background: rgba(0, 0, 0, 0.1);
+            border: none;
+            border-radius: 4px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+
+        .message-action:hover {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .file-attachment {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 12px;
+            background-color: var(--file-bubble);
+            border-radius: 6px;
+            margin-top: 8px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .file-attachment i {
+            margin-right: 8px;
+            color: #2e7d32;
+        }
+
+        /* Input Area Styles */
+        #input-container {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+            background-color: var(--surface);
+        }
+
+        #input-area {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            display: flex;
+        }
+
+        #user-input {
+            flex-grow: 1;
+            padding: 12px 50px 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            font-size: 15px;
+            outline: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: border-color 0.2s, box-shadow 0.2s;
+            min-height: 48px;
+            max-height: 150px;
+            resize: none;
+        }
+
+        #user-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(30, 136, 229, 0.2);
+        }
+
+        #send-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--primary);
+            padding: 8px;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+        }
+
+        #send-btn:hover {
+            background-color: rgba(30, 136, 229, 0.1);
+        }
+
+        #controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 12px;
+            gap: 16px;
+        }
+
+        .control-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .control-btn:hover {
+            color: var(--primary);
+            background-color: rgba(30, 136, 229, 0.1);
+        }
+
+        .control-btn i {
+            margin-right: 6px;
+        }
+
+        /* Typing Indicator */
+        .typing-indicator {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            background-color: var(--bot-bubble);
+            border-radius: 12px;
+            margin-left: 48px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--text-secondary);
+            margin: 0 2px;
+            animation: typingAnimation 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typingAnimation {
+
+            0%,
+            60%,
+            100% {
+                transform: translateY(0);
+            }
+
+            30% {
+                transform: translateY(-3px);
+            }
+        }
+
+        /* Login Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--surface);
+            padding: 24px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(30, 136, 229, 0.2);
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background-color: #f5f5f5;
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: #e0e0e0;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-3 {
+            margin-top: 16px;
+        }
+
+        .text-muted {
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        .text-error {
+            color: var(--error);
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        /* Rate Limit Info */
+        #rate-limit-info {
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-align: center;
+            padding: 8px 0 0;
+        }
+
+        /* File Input */
+        #file-input {
+            display: none;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            #sidebar {
+                position: fixed;
+                left: -280px;
+                top: 0;
+                bottom: 0;
+            }
+
+            #sidebar.open {
+                transform: translateX(280px);
+            }
+
+            #menu-toggle {
+                display: block;
+            }
+
+            .message-bubble {
+                max-width: 90%;
+            }
+
+            .message-actions {
+                opacity: 1;
+            }
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--text-primary);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            background-color: var(--success);
+        }
+
+        .toast.error {
+            background-color: var(--error);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Welcome To Wrool-AI</h2>
+                <p class="text-muted">Sign in to continue</p>
+            </div>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" class="form-control" required>
+                </div>
+                <div id="login-error" class="text-error"></div>
+                <button type="submit" class="btn btn-primary mt-3">Sign In</button>
+            </form>
+            <div class="text-center mt-3">
+                <p class="text-muted">Don't have an account? <a href="#" id="show-register">Sign up</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="register-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create Account</h2>
+                <p class="text-muted">Join our AI community</p>
+            </div>
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="register-name">Name</label>
+                    <input type="text" id="register-name" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-email">Email</label>
+                    <input type="email" id="register-email" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Password</label>
+                    <input type="password" id="register-password" class="form-control" required>
+                </div>
+                <div id="register-error" class="text-error"></div>
+                <button type="submit" class="btn btn-primary mt-3">Create Account</button>
+            </form>
+            <div class="text-center mt-3">
+                <p class="text-muted">Already have an account? <a href="#" id="show-login">Sign in</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Main App -->
+    <div id="app-container">
+        <div id="sidebar">
+            <div class="sidebar-header">
+                <h2>Welcome To Wrool-AI</h2>
+            </div>
+            <div id="user-profile">
+                <div id="user-avatar"></div>
+                <div id="user-info">
+                    <div id="user-name">User Login</div>
+                    <div id="user-email"></div>
+                </div>
+            </div>
+            <button id="new-chat-btn">
+                <i class="fas fa-plus"></i>
+                New Chat
+            </button>
+
+            <div id="chat-history">
+                <!-- Save here the chat history 
+                
+               
+               user to serche anyting and save here
+               
+               
+               
+               
+               -->
+            </div>
+        </div>
+
+        <div id="main-content">
+            <div id="chat-header">
+                <button id="menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div id="chat-title">Welcome To Wrool-AI</div>
+                <select id="model-selector">
+                    <option value="deepseek">Chat-Q</option>
+                    <option value="openai">Chat-Q Pro</option>
+                </select>
+            </div>
+
+            <div id="chat-container">
+                <div class="message-container">
+                    <div class="message bot-message">
+                        <div class="message-content">
+                            <div class="message-bubble">
+                                <div class="message-actions">
+                                    <button class="message-action" title="Copy">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div id="input-container">
+                <div id="input-area">
+                    <textarea id="user-input" placeholder="Ask me anything..." rows="1"></textarea>
+                    <button id="send-btn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                    <input type="file" id="file-input" accept=".pdf,.txt,.doc,.docx,.csv,.xlsx">
+                </div>
+                <div id="controls">
+                    <button class="control-btn" id="file-btn">
+                        <i class="fas fa-paperclip"></i>
+                        Attach File
+                    </button>
+                    <button class="control-btn" id="settings-btn">
+                        <i class="fas fa-cog"></i>
+                        Settings
+                    </button>
+                </div>
+                <div id="rate-limit-info">All Rights Receive &copy; By
+                    Developer <span id="rate-limit-count">&erarr; </span>Wrool IT Solutions
+                </div>
+            </div>
+        </div>
+        <script src="/static/js/javascript.js"></script>
+    </div>
+
+</body>
+
+</html>

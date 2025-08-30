@@ -1,0 +1,39 @@
+# Wrool-AI Default Configuration
+
+model:
+  name: "wrool-base"
+  type: "transformer"
+  hidden_size: 768
+  num_layers: 12
+  num_heads: 12
+  dropout: 0.1
+
+training:
+  batch_size: 32
+  learning_rate: 0.0001
+  num_epochs: 10
+  warmup_steps: 1000
+  max_grad_norm: 1.0
+
+data:
+  max_length: 512
+  preprocessing:
+    lowercase: true
+    remove_punctuation: true
+    tokenize: true
+
+hardware:
+  use_gpu: true
+  num_workers: 4
+  precision: "fp32"
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/wrool_ai.log"
+
+api:
+  host: "0.0.0.0"
+  port: 8000
+  debug: false
+  workers: 4
