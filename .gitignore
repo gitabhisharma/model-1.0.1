@@ -108,3 +108,6 @@ requirements.txt
 Dotenv
 .venv
 .idea_backup/
+
+*setup.py
+
