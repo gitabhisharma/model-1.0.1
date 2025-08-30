@@ -111,3 +111,10 @@ Dotenv
 
 *setup.py
 *run.sh
+*pyproject.toml
+*wrool-ai-deployment.yaml
+*.text
+*.env
+src/wrool_ai/config/*default.yaml
+src/wrool_ai/config/*production.yaml
+src/wrool_ai/config/*__init__.py
