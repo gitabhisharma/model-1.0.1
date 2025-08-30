@@ -1,5 +1,5 @@
-from src.wrool_ai.modules.nlp.text_classifier import TextClassifier
-from src.wrool_ai.utils.config_loader import ConfigLoader
+from ..src.wrool_ai.modules.nlp.text_classifier import TextClassifier
+from ..src.wrool_ai.utils.config_loader import ConfigLoader
 
 # Load configuration
 config_loader = ConfigLoader()

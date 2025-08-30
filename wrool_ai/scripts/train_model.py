@@ -1,9 +1,9 @@
 import torch
 from torch.utils.data import DataLoader
 from transformers import AdamW, get_linear_schedule_with_warmup
-from src.wrool_ai.modules.nlp.text_classifier import TextClassifier
-from src.wrool_ai.utils.config_loader import ConfigLoader
-from src.wrool_ai.utils.logger import setup_logger
+from ..src.wrool_ai.modules.nlp.text_classifier import TextClassifier
+from ..src.wrool_ai.utils.config_loader import ConfigLoader
+from ..src.wrool_ai.utils.logger import setup_logger
 
 def train_model():
     """Training script for Wrool-AI models"""

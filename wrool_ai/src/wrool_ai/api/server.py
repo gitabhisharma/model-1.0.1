@@ -57,8 +57,7 @@ def run_server():
         app,
         host=config["api"]["host"],
         port=config["api"]["port"],
-        workers=config["api"]["workers"],
-        debug=config["api"]["debug"]
+        workers=config["api"]["workers"]
     )
 
 if __name__ == "__main__":

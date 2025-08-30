@@ -1,6 +1,6 @@
 import pytest
 import torch
-from src.wrool_ai.modules.nlp.text_classifier import TextClassifier
+from ...src.wrool_ai.modules.nlp.text_classifier import TextClassifier
 
 def test_model_initialization():
     """Test that model initializes correctly"""
