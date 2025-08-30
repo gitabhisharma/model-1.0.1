@@ -105,7 +105,6 @@ src/wrool_ai/*__init__.py
 .text
 requirements.txt
 
-
-.env
+Dotenv
 .venv
 .idea_backup/
