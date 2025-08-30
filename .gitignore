@@ -110,4 +110,4 @@ Dotenv
 .idea_backup/
 
 *setup.py
-
+*run.sh
